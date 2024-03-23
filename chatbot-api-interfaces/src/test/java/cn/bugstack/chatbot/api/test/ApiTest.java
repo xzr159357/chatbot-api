@@ -1,5 +1,6 @@
 package cn.bugstack.chatbot.api.test;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -11,10 +12,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
-import java.beans.Transient;
 import java.io.IOException;
-import java.net.URLDecoder;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * @author 小傅哥，微信：fustack
@@ -28,38 +26,30 @@ public class ApiTest {
     public void query_unanswered_questions() throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
-        HttpGet get = new HttpGet("https://api.zsxq.com/v2/groups/28885518425541/topics?scope=all&count=20");
+        HttpGet get = new HttpGet("https://api.zsxq.com/v2/groups/15555541214242/topics?scope=unanswered_questions&count=20");
 
-        get.addHeader("cookie", "zsxq_access_token=83DE09B7-6E63-2599-D255-2A119452CE84_E8C2F9997B79BC19; abtest_env=product; zsxqsessionid=84089c695b1a4c15d1c49f2807d7a1bc");
+        get.addHeader("cookie", "zsxq_access_token=83DE09B7-6E63-2599-D255-2A119452CE84_E8C2F9997B79BC19; abtest_env=product; zsxqsessionid=a7975b192290b9cebc3f8498a92bf09a");
         get.addHeader("Content-Type", "application/json;charset=utf8");
 
         CloseableHttpResponse response = httpClient.execute(get);
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            String ans = EntityUtils.toString(response.getEntity());
-            ans = StringEscapeUtils.unescapeJava(ans);
-            System.out.println(ans);
+            String res = EntityUtils.toString(response.getEntity());
+            res = StringEscapeUtils.unescapeJava(res);
+            System.out.println(res);
         } else {
             System.out.println(response.getStatusLine().getStatusCode());
         }
-
     }
 
     @Test
     public void answer() throws IOException {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
-        HttpPost post = new HttpPost("https://api.zsxq.com/v2/topics/412884248251548/answer");
-        post.addHeader("cookie", "zsxq_access_token=83DE09B7-6E63-2599-D255-2A119452CE84_E8C2F9997B79BC19; abtest_env=product; zsxqsessionid=84089c695b1a4c15d1c49f2807d7a1bc");
+        HttpPost post = new HttpPost("https://api.zsxq.com/v2/topics/8855841118222182/answer");
+        post.addHeader("cookie", "zsxq_access_token=83DE09B7-6E63-2599-D255-2A119452CE84_E8C2F9997B79BC19; abtest_env=product; zsxqsessionid=a7975b192290b9cebc3f8498a92bf09a");
         post.addHeader("Content-Type", "application/json;charset=utf8");
 
-        // 需要修改情况
-        String paramJson = "{\n" +
-                "  \"req_data\": {\n" +
-                "    \"text\": \"自己去百度！\\n\",\n" +
-                "    \"image_ids\": [],\n" +
-                "    \"silenced\": false\n" +
-                "  }\n" +
-                "}";
+        String paramJson = "{\"req_data\":{\"text\":\"自己去百度！\\n\",\"image_ids\":[]}}";
 
         StringEntity stringEntity = new StringEntity(paramJson, ContentType.create("text/json", "UTF-8"));
         post.setEntity(stringEntity);
@@ -67,9 +57,11 @@ public class ApiTest {
         CloseableHttpResponse response = httpClient.execute(post);
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             String res = EntityUtils.toString(response.getEntity());
+            res = StringEscapeUtils.unescapeJava(res);
             System.out.println(res);
         } else {
             System.out.println(response.getStatusLine().getStatusCode());
         }
     }
+
 }
