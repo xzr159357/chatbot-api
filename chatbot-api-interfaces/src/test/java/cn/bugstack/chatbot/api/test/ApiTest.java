@@ -1,7 +1,9 @@
 package cn.bugstack.chatbot.api.test;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -61,6 +63,46 @@ public class ApiTest {
             System.out.println(res);
         } else {
             System.out.println(response.getStatusLine().getStatusCode());
+        }
+    }
+
+    @Test
+    public void test_chatGPT() throws IOException {
+        System.out.println("sadsad");
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("https://api.openai.com/v1/completions");
+        post.addHeader("Content-Type", "application/json");
+        post.addHeader("Authorization", "Bearer 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");
+
+        // 代理，用于连接openai
+        String pro = "127.0.0.1";//本机地址
+        int pro1 = 7890; //代理端口号
+        //创建一个 HttpHost 实例，这样就设置了代理服务器的主机和端口。
+        HttpHost httpHost = new HttpHost(pro, pro1);
+        //创建一个 RequestConfig 对象，然后使用 setProxy() 方法将代理 httpHost 设置进去。
+        RequestConfig build = RequestConfig.custom().setProxy(httpHost).build();
+        post.setConfig(build);
+
+
+//        String paramJson = "{\"model\": \"text-davinci-003\", \"prompt\": \"帮我写一个java冒泡排序\", \"temperature\": 0, \"max_tokens\": 1024}";
+        String paramJson = "{\n" +
+                "     \"model\": \"gpt-3.5-turbo\",\n" +
+                "     \"messages\": [{\"role\": \"user\", \"content\": \"帮我写一个java冒泡排序\"}],\n" +
+                "     \"temperature\": 0.7\n" +
+                "   }";
+
+        StringEntity stringEntity = new StringEntity(paramJson, ContentType.create("text/json", "UTF-8"));
+        post.setEntity(stringEntity);
+
+        CloseableHttpResponse response = httpClient.execute(post);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            String res = EntityUtils.toString(response.getEntity());
+            System.out.println(res);
+        } else {
+            System.out.println("false");
+            System.out.println(response.getStatusLine().getStatusCode());
+            System.out.println(response.getEntity());
+            System.out.println(response.getStatusLine());
         }
     }
 
